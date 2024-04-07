@@ -9,3 +9,32 @@ Kluczową funkcjonalnością aplikacji jest wyszukiwarka lotów stworzona dzięk
 Inną funkcjonalnością jest możliwość sprawdzenia aktualnych warunków pogodowych dla lokalizacji. Umożliwia to zakładka „check weather”, również dostępna z paska nawigacyjnego ([ekran CheckWeather w Figma](https://www.figma.com/file/9qPMckkVm8SStCAa8Q9LMS/europeWays?type=design&node-id=0%3A1&mode=dev&t=KhvChrnVDq4WOq9k-1)). Użytkownik może dostrzec aktualną temperaturę czy prognozę na najbliższe dni. Dane pochodzą z zewnętrznych źródeł i pobierane za pomocą API popularnych stron pogodowych. 
 
 Ostatnią funkcjonalnością jest możliwość podejrzenia najważniejszych informacji związanych z miastem docelowym. Użytkownik podając nazwę miasta może dowiedzieć się jaką walutą posługują się mieszkańcy danego kraju, w jakim języku mówią czy jaka religia jest dominującą. Ta funkcjonalność jest dostępna z paska nawigacyjnego pod nazwą „city guide” ([ekran CityGuide w Figma](https://www.figma.com/file/9qPMckkVm8SStCAa8Q9LMS/europeWays?type=design&node-id=0%3A1&mode=dev&t=KhvChrnVDq4WOq9k-1)). 
+
+
+<script setup>
+
+import { ref, onBeforeMount } from "vue"
+
+const dogs = ref("")
+
+    onBeforeMount(async() => {
+        try{
+            const response = await fetch("https://dog.ceo/api/breeds/image/random");
+            dogs.value = await response.json();
+        }
+        catch {
+            dogs.value = "wysypalo sie api"
+        }
+
+
+    })
+
+</script>
+
+<template>
+    <h1>Dogs breeds</h1>
+    <p>{{ dogs }}</p>
+</template>
+
+<style scoped>
+</style>
