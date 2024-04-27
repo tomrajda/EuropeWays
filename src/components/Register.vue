@@ -6,18 +6,50 @@
 
     const router = useRouter();
     const form = ref({
-        username: '',
+        name: '',
         email: '',
         password: '',
-        password_confirm: ''
+        password_confirmation: ''
     });
 
-    const handleRegister = async() => {
-        await axios.post('/register', {
+    const getCookie = (cookieName) => {
+        const name = cookieName + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const cookieArray = decodedCookie.split(';');
+
+        for (let i = 0; i < cookieArray.length; i++) {
+        let cookie = cookieArray[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1);
+        }
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length, cookie.length);
+        }
+        }
+        return "";
+    };
+
+    const getToken = async () => {
+        await axios.get('/sanctum/csrf-cookie');
+    };
+
+    const handleRegister = async () => {
+        await getToken();
+        
+        await axios.post(
+        '/register', 
+        {
             name: form.value.name,
             email: form.value.email,
             password: form.value.password,
-            password_confirm: form.value.password_confirm
+            password_confirmation: form.value.password_confirmation
+        },
+        {
+            headers: {
+            accept: 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+            },
+            withCredentials: true,
         });
         router.push("/");
     };
@@ -29,7 +61,7 @@
         <div class="sm:mx-auto sm:max-w-xl sm:w-full sm:rounded-lg">
             <div class="bg-white px-10 py-10 shadow-xl ring-1 ring-gray-900/5 grid sm:grid-cols-1 gap-8">
                 <div class="flex items-center justify-center sm:justify-start">
-                    <h1 class="text-2xl font-semibold mr-2 black">europe</h1>
+                    <h1 class="text-2xl font-semibold mr-2 blackrun dev">europe</h1>
                     <img src="./img/Globe.svg" class="h-8 mr-2 text-indigo-600" alt="Tailwind Play" />
                     <h1 class="text-2xl font-semibold text-indigo-600">Ways</h1>
                 </div>
@@ -37,10 +69,10 @@
                     <div id="app">
                         <form @submit.prevent ="handleRegister">
                             <div class="mb-4">
-                                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
                                 <input 
-                                    id="username" 
-                                    v-model="form.username"
+                                    id="name" 
+                                    v-model="form.name"
                                     type="text" 
                                     class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
                                     placeholder="Username">
@@ -67,7 +99,7 @@
                                 <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm password</label>
                                 <input 
                                     id="confirmPassword"
-                                    v-model="form.password_confirm"
+                                    v-model="form.password_confirmation"
                                     type="password" 
                                     class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
                                     placeholder="Confirm password">
