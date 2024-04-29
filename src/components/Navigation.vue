@@ -1,4 +1,48 @@
 <script setup>
+
+    import { useAuthStore } from '../stores/auth';
+    import axios from 'axios';
+    import { useRouter } from 'vue-router';
+    
+    const authStore = useAuthStore();
+    const router = useRouter();
+
+    const getCookie = (cookieName) => {
+        const name = cookieName + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const cookieArray = decodedCookie.split(';');
+
+        for (let i = 0; i < cookieArray.length; i++) {
+        let cookie = cookieArray[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1);
+        }
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length, cookie.length);
+        }
+        }
+        return "";
+    };
+
+    const getToken = async () => {
+        await axios.get('/sanctum/csrf-cookie');
+    };
+
+    const handleLogout = async () => {
+        await getToken();
+        await axios.post(
+            '/logout',
+            {},
+            {
+            headers: {
+                'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
+            },
+            }
+        );
+        authStore.authUser = null;
+        router.push('/');
+    };
+
 </script>
 
 <template>
@@ -81,8 +125,53 @@
                             >One way flight</router-link
                         >
                     </li>
-                    <li>
-                        <router-link :to="{name: 'Login'}"
+                    <template v-if="!authStore.user">
+                        <li>
+                            <router-link :to="{name: 'Login'}"
+                                class="
+                                    block
+                                    rounded
+                                    py-2
+                                    pr-4
+                                    pl-3
+                                    text-gray-700
+                                    hover:bg-gray-100
+                                    dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white
+                                    md:border-0
+                                    md:p-0
+                                    md:hover:bg-transparent
+                                    md:hover:text-blue-700
+                                    md:dark:hover:bg-transparent
+                                    md:dark:hover:text-white
+                                "
+                                >Login</router-link
+                            >
+                        </li>
+                        <li>
+                            <router-link :to="{name: 'Signup'}"
+                                class="
+                                    block
+                                    rounded
+                                    py-2
+                                    pr-4
+                                    pl-3
+                                    text-gray-700
+                                    hover:bg-gray-100
+                                    dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white
+                                    md:border-0
+                                    md:p-0
+                                    md:hover:bg-transparent
+                                    md:hover:text-blue-700
+                                    md:dark:hover:bg-transparent
+                                    md:dark:hover:text-white
+                                "
+                                >Sign Up</router-link
+                            >
+                        </li>  
+                    </template>
+                    <template v-else>
+                        <button  
+                            @click="handleLogout"
                             class="
                                 block
                                 rounded
@@ -99,30 +188,8 @@
                                 md:dark:hover:bg-transparent
                                 md:dark:hover:text-white
                             "
-                            >Login</router-link
-                        >
-                    </li>
-                    <li>
-                        <router-link :to="{name: 'Signup'}"
-                            class="
-                                block
-                                rounded
-                                py-2
-                                pr-4
-                                pl-3
-                                text-gray-700
-                                hover:bg-gray-100
-                                dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white
-                                md:border-0
-                                md:p-0
-                                md:hover:bg-transparent
-                                md:hover:text-blue-700
-                                md:dark:hover:bg-transparent
-                                md:dark:hover:text-white
-                            "
-                            >Sign Up</router-link
-                        >
-                    </li>            
+                        >Logout</button>
+                    </template>
                 </ul>
             </div>
         </div>

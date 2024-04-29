@@ -4,8 +4,6 @@
   import axios from 'axios';
   import { useRouter } from 'vue-router';
 
-  axios.defaults.withCredentials = true;
-
   const router = useRouter();
   const form = ref({
     email: '',
