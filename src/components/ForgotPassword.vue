@@ -70,7 +70,7 @@ const handleForgotPassword = async (email) => {
           <div id="app">
             <form @submit.prevent="handleForgotPassword(email)">
               <div class="mb-8">
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Please, enter your account e-mail.</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Please, enter your account email?</label>
                 <input 
                   id="email" 
                   type="email"
