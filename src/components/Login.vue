@@ -2,7 +2,7 @@
   
   import { ref } from 'vue';
   import axios from 'axios';
-  import { useRouter } from 'vue-router';
+  import { RouterLink, useRouter } from 'vue-router';
   import { useAuthStore } from '../stores/auth';
 
   const authStore = useAuthStore();
@@ -101,7 +101,8 @@
                         </span>
                       </div>
                       <div class="mt-6 text-sm">
-                          <a href="#" class="text-indigo-600 hover:text-indigo-800">Forgot password?</a>
+                        <router-link :to="{name: 'ForgotPassword'}" class="text-indigo-600 hover:text-indigo-800">Forgot password?</router-link>
+
                       </div>
                       <div class="mt-4 text-sm">
                           <p class="text-gray-600">Don't have an account? <router-link :to="{name: 'Signup'}" class="text-indigo-600 hover:text-indigo-800">Sign up</router-link></p>

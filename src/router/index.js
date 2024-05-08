@@ -3,16 +3,18 @@ import Home from '../components/Home.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
 import OneWayCheapest from '../components/OneWayCheapest.vue'
+import ForgotPassword from "../components/ForgotPassword.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
     { path: '/login', name: 'Login', component: Login },
     { path: '/signup', name: 'Signup', component: Register },
-    { path: '/onewaycheapest', name: 'OneWayCheapest', component: OneWayCheapest }
+    { path: '/onewaycheapest', name: 'OneWayCheapest', component: OneWayCheapest },
+    { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPassword },
 ];
 
 const router = createRouter({
-    history: createWebHistory(), // You need to call createWebHistory as a function
+    history: createWebHistory(),
     routes
 });
 
