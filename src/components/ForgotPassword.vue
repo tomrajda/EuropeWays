@@ -9,6 +9,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const email = ref('');
+const status = ref('');
 
 const getCookie = (cookieName) => {
   const name = cookieName + "=";
@@ -34,26 +35,27 @@ const getToken = async () => {
 const handleForgotPassword = async (email) => {
   await getToken();
   try {
-    await axios.post(
-      '/forgot-password', 
-      {
-        email: email,
+  const response = await axios.post(
+    '/forgot-password', 
+    {
+      email: email,
+    },
+    {
+      headers: {
+        accept: 'application/json',
+        'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
       },
-      {
-        headers: {
-          accept: 'application/json',
-          'X-XSRF-TOKEN': getCookie('XSRF-TOKEN'),
-        },
-        withCredentials: true,
-      }
-    );
-    await authStore.getUser();
-    router.push("/");
-  } catch(error){
-    if(error.response.status === 422) {
-      authStore.setErrors(error.response.data.errors);
+      withCredentials: true,
     }
+  );
+  status.value = response.data.status;
+  await authStore.getUser();
+  router.push("/");
+} catch(error){
+  if(error.response.status === 422) {
+    authStore.setErrors(error.response.data.errors);
   }
+}
 };
 </script>
 
@@ -70,7 +72,7 @@ const handleForgotPassword = async (email) => {
           <div id="app">
             <form @submit.prevent="handleForgotPassword(email)">
               <div class="mb-8">
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Please, enter your account email?</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Please, enter your account email</label>
                 <input 
                   id="email" 
                   type="email"
@@ -86,9 +88,10 @@ const handleForgotPassword = async (email) => {
                 Submit
               </button>
             </form>
-            <div class="mt-6 text-sm text-red-500">
+            <div class="mt-6 m-2 p-2 text-green-900 font-semibold bg-green-300 rounded-md" v-if="status">{{ status }}</div>
+            <div class="mt-6 m-2 text-red-900 font-semibold bg-red-300 rounded-md">
               <span v-for="error in authStore.errors" :key="error">
-                <div>{{ error[0] }}</div>
+                  <div>{{ error[0] }}</div>
               </span>
             </div>
           </div>

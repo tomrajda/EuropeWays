@@ -112,11 +112,11 @@
                 </div>
                 <button type="submit" class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign Up</button>
               </form>
-              <div class="mt-6 text-sm text-red-500">
+              <div class="mt-6 m-2 text-red-900 font-semibold bg-red-300 rounded-md">
                 <span v-for="error in authStore.errors" :key="error">
                     <div>{{ error[0] }}</div>
                 </span>
-              </div>            
+              </div>           
               <div class="mt-6 text-sm">
                 <p class="text-gray-600">Already have an account? <router-link :to="{name: 'Login'}" class="text-indigo-600 hover:text-indigo-800">Sign In</router-link></p>
               </div>

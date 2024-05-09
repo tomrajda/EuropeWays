@@ -4,6 +4,7 @@ import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
 import OneWayCheapest from '../components/OneWayCheapest.vue'
 import ForgotPassword from "../components/ForgotPassword.vue";
+import ResetPassword from "../components/ResetPassword.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: Home },
@@ -11,6 +12,7 @@ const routes = [
     { path: '/signup', name: 'Signup', component: Register },
     { path: '/onewaycheapest', name: 'OneWayCheapest', component: OneWayCheapest },
     { path: '/forgot-password', name: 'ForgotPassword', component: ForgotPassword },
+    { path: '/password-reset/:token', name: 'ResetPassword', component: ResetPassword }
 ];
 
 const router = createRouter({
