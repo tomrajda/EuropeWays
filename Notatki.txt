@@ -1,0 +1,12 @@
+do dodaowania danych do bazy w backlend edycja:
+
+api.php -> dodanie trasy
+
+UserDataController.php dodanie controllera -> php artisan make:controller UserDataController
+
+UserData.php dodanie takiego czegos 
+
+utworzenie datatable w mysql poprzez migracje:
+php artisan make:migration create_user_data_table
+database/migrations/YYYY_MM_DD_create_user_data_table.php
+php artisan migrate
