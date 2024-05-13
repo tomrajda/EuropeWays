@@ -108,23 +108,6 @@
                         md:dark:bg-gray-900
                     "
                 >
-                    <li>
-                        <router-link :to="{name: 'OneWayCheapest'}"
-                            class="
-                                block
-                                rounded
-                                bg-blue-700
-                                py-2
-                                pr-4
-                                pl-3
-                                text-white
-                                dark:text-white
-                                md:bg-transparent md:p-0 md:text-blue-700    
-                            "
-                            aria-current="page"
-                            >One way flight</router-link
-                        >
-                    </li>
                     <template v-if="!authStore.user">
                         <li>
                             <router-link :to="{name: 'Login'}"
@@ -170,6 +153,69 @@
                         </li>  
                     </template>
                     <template v-else>
+                        <li>
+                            <router-link :to="{name: 'History'}"
+                                class="
+                                    block
+                                    rounded
+                                    py-2
+                                    pr-4
+                                    pl-3
+                                    text-gray-700
+                                    hover:bg-gray-100
+                                    dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white
+                                    md:border-0
+                                    md:p-0
+                                    md:hover:bg-transparent
+                                    md:hover:text-blue-700
+                                    md:dark:hover:bg-transparent
+                                    md:dark:hover:text-white
+                                "
+                                >Tester</router-link
+                            >
+                        </li>
+                        <li>
+                            <router-link :to="{name: 'UserHistory'}"
+                                class="
+                                    block
+                                    rounded
+                                    py-2
+                                    pr-4
+                                    pl-3
+                                    text-gray-700
+                                    hover:bg-gray-100
+                                    dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white
+                                    md:border-0
+                                    md:p-0
+                                    md:hover:bg-transparent
+                                    md:hover:text-blue-700
+                                    md:dark:hover:bg-transparent
+                                    md:dark:hover:text-white
+                                "
+                                >My flights</router-link
+                            >
+                        </li>
+                        <li>
+                            <router-link :to="{name: 'FlightSearch'}"
+                                class="
+                                    block
+                                    rounded
+                                    py-2
+                                    pr-4
+                                    pl-3
+                                    text-gray-700
+                                    hover:bg-gray-100
+                                    dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white
+                                    md:border-0
+                                    md:p-0
+                                    md:hover:bg-transparent
+                                    md:hover:text-blue-700
+                                    md:dark:hover:bg-transparent
+                                    md:dark:hover:text-white
+                                "
+                                >Flight search</router-link
+                            >
+                        </li>
                         <li>
                             <router-link :to="{name: 'SaveData'}"
                                 class="
