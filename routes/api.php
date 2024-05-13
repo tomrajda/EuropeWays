@@ -20,5 +20,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 use App\Http\Controllers\UserDataController;
+use App\Http\Controllers\HistoryController;
 
 Route::post('/save-data', [UserDataController::class, 'save']);
+Route::post('/save-history', [HistoryController::class, 'save']);
+
+Route::middleware(['auth:sanctum'])->get('/history-data', [HistoryController::class, 'index']);

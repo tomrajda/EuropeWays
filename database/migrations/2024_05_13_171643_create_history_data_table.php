@@ -4,20 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserDataTable extends Migration
+class CreateHistoryDataTable extends Migration
 {
     public function up()
     {
-        Schema::create('user_data', function (Blueprint $table) {
+        Schema::create('history_data', function (Blueprint $table) {
             $table->id();
-            $table->string('username');
-            $table->string('email')->unique();
+            $table->string('user_id');
+            $table->string('api_url');
+            $table->string('amount');
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('user_data');
+        Schema::dropIfExists('history_data');
     }
 }
