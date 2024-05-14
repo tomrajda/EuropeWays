@@ -6,7 +6,7 @@ const historyData = ref([]);
 
 const fetchHistoryData = async () => {
   try {
-    const response = await axios.get('/api/history-data');
+    const response = await axios.get('/api/flight-history');
     historyData.value = response.data;
   } catch (error) {
     console.error(error);

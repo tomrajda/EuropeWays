@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import axios from 'axios';
 
 const origin = ref('');
 const destination = ref('');
@@ -14,7 +15,10 @@ const airportsAval = ref([]);
 const cheapestCallResponse = ref(null)
 const cheapestReturnCallResponse = ref(null);
 const selectedOption = ref('oneWay')
-
+const userData = ref({
+  api_url: '',
+  amount: 0
+});
 
 const getCheapestFlight = async () => {
   try {
@@ -141,14 +145,79 @@ function formatReadableDate(isoDate) {
 
 // Saving flight
 
+const savedAPIURLs = ref([]);
+const savedPrices = ref([]);
+
+const saveFlightDetails = () => {
+  // Clear previous data
+  savedAPIURLs.value = [];
+  savedPrices.value = [];
+
+  if (cheapestFlight.value) {
+    savedAPIURLs.value.push(`https://www.ryanair.com/api/farfnd/v4/oneWayFares/${origin.value}/${destination.value}/cheapestPerDay?outboundMonthOfDate=${departDate.value}&currency=${currency.value}`);
+    savedPrices.value.push(cheapestFlight.value.price.value);
+  }
+  if (selectedOption.value === 'return' && cheapestReturnFlight.value) {
+    savedAPIURLs.value.push(`https://www.ryanair.com/api/farfnd/v4/oneWayFares/${destination.value}/${origin.value}/cheapestPerDay?outboundMonthOfDate=${returnDate.value}&currency=${currency.value}`);
+    savedPrices.value.push(cheapestReturnFlight.value.price.value);
+  }
+
+  // Set the userData object with updated values as arrays
+  userData.value.api_url = savedAPIURLs.value;
+  userData.value.amount = savedPrices.value;
+
+  // Debug: Log userData
+  console.log("userData:", userData.value);
+
+  // Display saved data in console
+  console.log("Saved API URLs:", savedAPIURLs.value);
+  console.log("Saved Prices:", savedPrices.value);
+};
 
 
 
+  const getCookie = (cookieName) => {
+    const name = cookieName + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(';');
 
+    for (let i = 0; i < cookieArray.length; i++) {
+      let cookie = cookieArray[i];
+      while (cookie.charAt(0) === ' ') {
+        cookie = cookie.substring(1);
+      }
+      if (cookie.indexOf(name) === 0) {
+        return cookie.substring(name.length, cookie.length);
+      }
+    }
+    return "";
+  };
 
+  const saveHistory = async () => {
+  try {
+    await axios.get('/sanctum/csrf-cookie');
 
+    const xsrfToken = getCookie('XSRF-TOKEN');
 
+    const config = {
+      headers: {
+        'X-XSRF-TOKEN': xsrfToken,
+      },
+    };
 
+    // Ensure api_url and amount are arrays before sending the request
+    const dataToSend = {
+      api_url: Array.isArray(userData.value.api_url) ? userData.value.api_url : [],
+      amount: Array.isArray(userData.value.amount) ? userData.value.amount : []
+    };
+
+    const response = await axios.post('/api/save-flight-history', dataToSend, config);
+    
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 </script>
 
@@ -223,31 +292,32 @@ function formatReadableDate(isoDate) {
     <p>Price: {{ cheapestFlight.price.value }} {{ cheapestFlight.price.currencySymbol }}</p>
   </div>
 
-  <div v-if="cheapestReturnFlight !== null" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+  <div v-if="cheapestReturnFlight !== null && cheapestFlight !== null" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
     <h2 class="text-lg font-semibold mb-4">Return:</h2>
     <p>Return Date: {{ formatReadableDate(cheapestReturnFlight.departureDate) }}</p>
     <p>Arrival Date: {{ formatReadableDate(cheapestReturnFlight.arrivalDate) }}</p>
     <p>Price: {{ cheapestReturnFlight.price.value }} {{ cheapestReturnFlight.price.currencySymbol }}</p>
   </div>
 
-  <div v-if="cheapestFlight === null && !error && cheapestCallResponse !== null" class="text-gray-700 bg-white shadow-md rounded px-8 py-4 mb-8">
+  <div v-if="cheapestFlight == null && !error && cheapestCallResponse !== null" class="text-gray-700 bg-white shadow-md rounded px-8 py-4 mb-8">
     <p>No flights found, try different date.</p>
   </div>
 
 
-  <div v-if="cheapestReturnFlight === null && !error && cheapestReturnCallResponse !== null" class="text-gray-700 bg-white shadow-md rounded px-8 py-4 mb-8">
+  <div v-if="cheapestReturnFlight == null && !error && cheapestReturnCallResponse !== null" class="text-gray-700 bg-white shadow-md rounded px-8 py-4 mb-8">
     <p>No return flights found, try different date.</p>
   </div>
-
-  <button 
-    type="button"
-    @click="saveFlightsToDatabase"
-    :disabled="!canSaveToDatabase"
-    class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
-    Save Flights to Database
-  </button>
-
+  
+  <div>
+    <form @submit.prevent="saveHistory">
+      <button 
+          type="submit" 
+          v-if="cheapestFlight" 
+          @click="saveFlightDetails" 
+          class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          :disabled="cheapestReturnFlight == null">Save flight</button>
+    </form>
+  </div>
 </div>
-
 
 </template>
