@@ -119,8 +119,6 @@ const handleSubmit = async () => {
     await getCheapestFlight();
     if (selectedOption.value == 'return') {
         await getCheapestReturn();
-    } else {
-        cheapestReturnFlight.value = null;
     }
 };
 
@@ -130,6 +128,14 @@ watch(origin, (newValue, oldValue) => {
     fetchAvalAirports();
 });
 
+
+watch(selectedOption, (newValue, oldValue) => {
+    if (newValue === 'oneWay') {
+        returnDate.value = '';
+        cheapestReturnFlight.value = null;
+        cheapestReturnCallResponse.value = null;
+    }
+});
 // CONVERTING DATES 
 
 function formatReadableDate(isoDate) {
@@ -294,7 +300,7 @@ const saveFlightDetails = () => {
       <p>Price: {{ cheapestFlight.price.value }} {{ cheapestFlight.price.currencySymbol }}</p>
     </div>
   
-    <div v-if="cheapestReturnFlight !== null && cheapestFlight !== null" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+    <div v-if="cheapestReturnFlight !== null && cheapestFlight !== null && selectedOption==='return' " class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
       <h2 class="text-lg font-semibold mb-4">Return:</h2>
       <p>Return Date: {{ formatReadableDate(cheapestReturnFlight.departureDate) }}</p>
       <p>Arrival Date: {{ formatReadableDate(cheapestReturnFlight.arrivalDate) }}</p>
@@ -306,7 +312,7 @@ const saveFlightDetails = () => {
     </div>
   
   
-    <div v-if="cheapestReturnFlight === null && !error && cheapestReturnCallResponse !== null && selectedOption==='return'" class="text-gray-700 bg-white shadow-md rounded px-8 py-4 mb-8">
+    <div v-if="cheapestReturnFlight === null && !error && cheapestReturnCallResponse !== null && selectedOption==='return' && returnDate !== '' " class="text-gray-700 bg-white shadow-md rounded px-8 py-4 mb-8">
       <p>No return flights found, try different date.</p>
     </div>
     
@@ -324,6 +330,5 @@ const saveFlightDetails = () => {
     </div>
 
   </div>
-  
   
   </template>
