@@ -45,4 +45,16 @@ class FlightHistoryController extends Controller
         // Return data as a JSON response
         return response()->json($flightHistoryData, 200);
     }
+
+    public function destroy($id)
+    {
+        $flightHistoryData = FlightHistoryData::where('id', $id)->where('user_id', Auth::id())->first();
+    
+        if ($flightHistoryData) {
+            $flightHistoryData->delete();
+            return response()->json(['message' => 'Flight history deleted successfully'], 200);
+        }
+    
+        return response()->json(['message' => 'Flight history not found'], 404);
+    }
 }
