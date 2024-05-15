@@ -1,32 +1,143 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '../stores/auth';
 
-const historyData = ref([]);
+const authStore = useAuthStore();
+const flightHistory = ref([]);
+const loading = ref(true);
+const error = ref(null);
 
-const fetchHistoryData = async () => {
+const getCookie = (cookieName) => {
+  const name = cookieName + "=";
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const cookieArray = decodedCookie.split(';');
+
+  for (let i = 0; i < cookieArray.length; i++) {
+    let cookie = cookieArray[i].trim();
+    if (cookie.indexOf(name) === 0) {
+      return cookie.substring(name.length, cookie.length);
+    }
+  }
+  return "";
+};
+
+const fetchFlightHistory = async () => {
   try {
-    const response = await axios.get('/api/flight-history');
-    historyData.value = response.data;
-  } catch (error) {
-    console.error(error);
+    await axios.get('/sanctum/csrf-cookie');
+
+    const xsrfToken = getCookie('XSRF-TOKEN');
+
+    const config = {
+      headers: {
+        'X-XSRF-TOKEN': xsrfToken,
+      },
+    };
+
+    const response = await axios.get('/api/flight-history', config);
+    flightHistory.value = response.data;
+    loading.value = false;
+  } catch (err) {
+    console.error(err);
+    error.value = 'Failed to fetch flight history';
+    loading.value = false;
   }
 };
 
-onMounted(() => {
-  fetchHistoryData();
-});
+const deleteFlight = async (flightId) => {
+  try {
+    await axios.get('/sanctum/csrf-cookie');
+
+    const xsrfToken = getCookie('XSRF-TOKEN');
+
+    const config = {
+      headers: {
+        'X-XSRF-TOKEN': xsrfToken,
+      },
+    };
+
+    await axios.delete(`/api/flight-history/${flightId}`, config);
+    flightHistory.value = flightHistory.value.filter(flight => flight.id !== flightId);
+  } catch (err) {
+    console.error(err);
+    error.value = 'Failed to delete flight';
+  }
+};
+
+const extractDetails = (url) => {
+  const regex = /\/oneWayFares\/([A-Z]{3})\/([A-Z]{3})\/cheapestPerDay\?outboundMonthOfDate=([0-9]{4}-[0-9]{2}-[0-9]{2})/;
+  const match = url.match(regex);
+  if (match) {
+    return {
+      departure: match[1],
+      destination: match[2],
+      when: match[3],
+    };
+  }
+  return {
+    departure: '',
+    destination: '',
+    when: '',
+  };
+};
+
+onMounted(fetchFlightHistory);
 </script>
 
 <template>
-    <div>
-        <h2>History Data</h2>
-        <ul>
-        <li v-for="data in historyData" :key="data.id">
-            <p>User ID: {{ data.user_id }}</p>
-            <p>API URL: {{ data.api_url }}</p>
-            <p>Amount: {{ data.amount }}</p>
-        </li>
-        </ul>
+  <div class="container mx-auto">
+    <h1 class="text-2xl font-semibold mb-6 mt-32">User Flight History</h1>
+
+    <div v-if="loading" class="text-gray-700">
+      Loading...
     </div>
+    
+    <div v-if="error" class="text-red-500">
+      {{ error }}
+    </div>
+
+    <div v-if="flightHistory.length && !loading" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+      <h2 class="text-lg font-semibold mb-4">Round-trip flights</h2>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="(flight, index) in flightHistory" :key="index">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div v-for="url in flight.api_url" :key="url">
+                {{ extractDetails(url).departure }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div v-for="url in flight.api_url" :key="url">
+                {{ extractDetails(url).destination }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div v-for="url in flight.api_url" :key="url">
+                {{ extractDetails(url).when }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div v-for="(price, priceIndex) in flight.amount" :key="priceIndex">
+                {{ price }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <button @click="deleteFlight(flight.id)" class="text-red-500 hover:underline">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
+
+
