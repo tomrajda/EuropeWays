@@ -67,17 +67,20 @@ const deleteFlight = async (flightId) => {
 const extractDetails = (url) => {
   const regex = /\/oneWayFares\/([A-Z]{3})\/([A-Z]{3})\/cheapestPerDay\?outboundMonthOfDate=([0-9]{4}-[0-9]{2}-[0-9]{2})/;
   const match = url.match(regex);
+  const currencyMatch = url.match(/currency=([A-Z]{3})/);
   if (match) {
     return {
       departure: match[1],
       destination: match[2],
       when: match[3],
+      currency: currencyMatch ? currencyMatch[1] : ''
     };
   }
   return {
     departure: '',
     destination: '',
     when: '',
+    currency: ''
   };
 };
 
@@ -103,9 +106,8 @@ onMounted(fetchFlightHistory);
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -127,11 +129,13 @@ onMounted(fetchFlightHistory);
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div v-for="(price, priceIndex) in flight.amount" :key="priceIndex">
-                {{ price }}
+                {{ price }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <button @click="deleteFlight(flight.id)" class="text-red-500 hover:underline">Delete</button>
+              <button @click="deleteFlight(flight.id)" class="text-red-500 bg-transparent border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-500 hover:text-white">
+                Remove
+              </button>
             </td>
           </tr>
         </tbody>
@@ -139,5 +143,3 @@ onMounted(fetchFlightHistory);
     </div>
   </div>
 </template>
-
-
