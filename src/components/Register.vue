@@ -63,13 +63,13 @@
 </script>
 
 <template>
-    <div class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12">
-      <div class="sm:mx-auto sm:max-w-xl sm:w-full sm:rounded-lg">
-        <div class="bg-white px-10 py-10 shadow-xl ring-1 ring-gray-900/5 grid sm:grid-cols-1 gap-8">
-          <div class="flex items-center justify-center sm:justify-start">
-            <h1 class="text-2xl font-semibold mr-2 blackrun dev">europe</h1>
-            <img src="./img/Globe.svg" class="h-8 mr-2 text-indigo-600" alt="Tailwind Play" />
-            <h1 class="text-2xl font-semibold text-indigo-600">Ways</h1>
+  <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg py-6 px-10 pt-4 pb-2 mb-10 mt-20">
+    <div class="sm:mx-auto sm:max-w-3xl py-10 sm:w-full sm:rounded-lg">
+      <div class="bg-white px-10 py-10 shadow-xl ring-1 ring-gray-900/5 grid sm:grid-cols-1 gap-8">
+        <div class="flex items-center justify-center sm:justify-start">
+          <p class="text-3xl font-semibold  blackrun dev">europe</p>
+              <img src="/public/Globe2.svg" alt="Logo" class="h-10 sm:h-12">
+              <p class="text-3xl font-semibold text-sky-700">Ways</p>
           </div>
           <div class="space-y-6 text-base leading-7 text-gray-600">
             <div id="app">
@@ -82,7 +82,7 @@
                     type="text" 
                     class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
                     placeholder="Username">
-                </div>
+                  </div>
                 <div class="mb-4">
                   <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input 
@@ -109,14 +109,14 @@
                     type="password" 
                     class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
                     placeholder="Confirm password">
-                </div>
+                  </div>
                 <button type="submit" class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Sign Up</button>
               </form>
               <div class="mt-6 m-2 text-red-900 font-semibold bg-red-300 rounded-md">
                 <span v-for="error in authStore.errors" :key="error">
                     <div>{{ error[0] }}</div>
                 </span>
-              </div>           
+              </div>            
               <div class="mt-6 text-sm">
                 <p class="text-gray-600">Already have an account? <router-link :to="{name: 'Login'}" class="text-indigo-600 hover:text-indigo-800">Sign In</router-link></p>
               </div>

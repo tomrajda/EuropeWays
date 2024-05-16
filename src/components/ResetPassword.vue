@@ -63,14 +63,14 @@ const handleResetPassword = async (resetData) => {
 </script>
 
 <template>
-  <div class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12">
-    <div class="sm:mx-auto sm:max-w-xl sm:w-full sm:rounded-lg">
-      <div class="bg-white px-10 py-10 shadow-xl ring-1 ring-gray-900/5 grid sm:grid-cols-1 gap-8">
-        <div class="flex items-center justify-center sm:justify-start">
-          <h1 class="text-2xl font-semibold mr-2 text-black">europe</h1>
-          <img src="./img/Globe.svg" class="h-8 mr-2 text-indigo-600" alt="Tailwind Play" />
-          <h1 class="text-2xl font-semibold text-indigo-600">Ways</h1>
-        </div>
+  <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg py-6 px-10 pt-4 pb-2 mb-10 mt-20">
+      <div class="sm:mx-auto sm:max-w-3xl py-10 sm:w-full sm:rounded-lg">
+          <div class="bg-white px-10 py-10 shadow-xl ring-1 ring-gray-900/5 grid sm:grid-cols-1 gap-8">
+              <div class="flex justify-center items-center sm:justify-start">
+                <p class="text-3xl font-semibold  blackrun dev">europe</p>
+                <img src="/public/Globe2.svg" alt="Logo" class="h-10 sm:h-12">
+                <p class="text-3xl font-semibold text-sky-700">Ways</p>
+              </div>
         <div class="space-y-6 text-base leading-7 text-gray-600">
           <div id="app">
             <form @submit.prevent="handleResetPassword(form)">
