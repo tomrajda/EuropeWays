@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
+const statusMessage = ref('')
 const authStore = useAuthStore();
 const origin = ref('');
 const destination = ref('');
@@ -130,11 +131,30 @@ watch(origin, (newValue, oldValue) => {
 
 
 watch(selectedOption, (newValue, oldValue) => {
+    statusMessage.value = '';
     if (newValue === 'oneWay') {
         returnDate.value = '';
         cheapestReturnFlight.value = null;
         cheapestReturnCallResponse.value = null;
     }
+});
+
+watch([origin, destination, departDate, returnDate], () => {
+    // Reset status message when clicking on search again
+    statusMessage.value = '';
+});
+
+
+
+watch(statusMessage, (newValue, oldValue) => {
+
+
+  // Ustaw timer na 5 sekund, po którym komunikat zniknie
+  setTimeout(() => {
+
+    // Wyczyść komunikat
+    statusMessage.value = '';
+  }, 5000);
 });
 // CONVERTING DATES 
 
@@ -222,8 +242,13 @@ const saveFlightDetails = () => {
     const response = await axios.post('/api/save-flight-history', dataToSend, config);
     
     console.log(response.data);
+    
+    statusMessage.value = 'Flight successfully added!';
+    document.getElementById('saveButton').disabled = true;
+
   } catch (error) {
     console.error(error);
+    statusMessage.value = 'Failed to add flight. Please try again.';
   }
 };
 
@@ -323,11 +348,22 @@ const saveFlightDetails = () => {
             v-if="cheapestFlight" 
             @click="saveFlightDetails" 
             class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            :disabled="cheapestReturnFlight === null && selectedOption ==='return'">
+            :disabled="cheapestReturnFlight === null && selectedOption ==='return'"
+            id="saveButton">
             Save {{ selectedOption === 'return' ? 'Return' : 'One-Way' }} Flight
         </button>
       </form>
     </div>
+
+    <div v-if="statusMessage" :class="[statusMessage === 'Flight successfully added!' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700', 'px-4 py-3 rounded relative mb-8']">
+    {{ statusMessage }}
+      <button @click="statusMessage = ''" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+        <svg class="h-6 w-6 text-black" role="button" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
 
   </div>
   
