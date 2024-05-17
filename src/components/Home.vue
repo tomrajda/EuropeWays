@@ -14,18 +14,6 @@
 
 <template>
 
-    <div v-if="authStore.user">
-        <div class="text-white absolute top-0 right-10">
-            <h1>Welcome again, {{ authStore.user.name }}!</h1>
-            <h1>Your are logged in using email {{ authStore.user.email }}</h1> 
-        </div>
-    </div>
-        <div v-else>
-            <div class="text-white absolute top-0 right-10">
-                <h1>logged out</h1> 
-        </div>
-    </div>
-
         <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg py-6 px-6 pt-4 pb-10 mb-20 mt-20">
             <h1 class="text-3xl text-center font-semibold mb-8 mt-10" >Don't know where you want to go? Our ideas for your trip!</h1>
             

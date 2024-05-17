@@ -46,6 +46,18 @@
 </script>
 
 <template>
+
+<div v-if="authStore.user">
+        <div class="text-gray-400 absolute top-4 right-14">
+            <h1>Welcome again, {{ authStore.user.name }}!</h1>
+        </div>
+    </div>
+        <div v-else>
+            <div class="text-gray-400 absolute top-4 right-14">
+                <h1>logged out</h1> 
+        </div>
+    </div>
+
     <nav>
         <div class=" bg-sky-950  flex flex-wrap  items-center justify-between" bis_skin_checked="1">
             <router-link :to="{name: 'Home'}" class="flex items-center text-white p-10 pl-80">
