@@ -50,7 +50,7 @@
         <div class=" bg-sky-950  flex flex-wrap  items-center justify-between" bis_skin_checked="1">
             <router-link :to="{name: 'Home'}" class="flex items-center text-white p-10 pl-80">
                 <p class="text-xl font-semibold  blackrun dev">sky</p>
-                <img src="/public/Globe.svg" alt="Logo" class="h-10 sm:h-8">
+                <img src="/public/plane.svg" alt="Logo" class="h-10 sm:h-12">
                 <p class="text-xl font-semibold text-sky-700">Saver</p>
             </router-link>
             <button 

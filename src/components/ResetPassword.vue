@@ -67,9 +67,9 @@ const handleResetPassword = async (resetData) => {
       <div class="sm:mx-auto sm:max-w-3xl py-10 sm:w-full sm:rounded-lg">
           <div class="bg-white px-10 py-10 shadow-xl ring-1 ring-gray-900/5 grid sm:grid-cols-1 gap-8">
               <div class="flex justify-center items-center sm:justify-start">
-                <p class="text-3xl font-semibold  blackrun dev">europe</p>
-                <img src="/public/Globe2.svg" alt="Logo" class="h-10 sm:h-12">
-                <p class="text-3xl font-semibold text-sky-700">Ways</p>
+                <p class="text-3xl font-semibold  blackrun dev">sky</p>
+                <img src="/public/plane2.svg" alt="Logo" class="h-10 sm:h-12">
+                <p class="text-3xl font-semibold text-sky-700">Saver</p>
               </div>
         <div class="space-y-6 text-base leading-7 text-gray-600">
           <div id="app">
