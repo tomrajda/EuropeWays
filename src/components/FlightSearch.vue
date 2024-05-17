@@ -264,10 +264,10 @@ watch(statusMessage, (newValue, oldValue) => {
     <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mb-20">
   
       <h1 class="text-3xl font-semibold mb-6 mt-20 text-gray-800" v-if="departDate && !returnDate">
-        <br>Find one way cheapest flight near <b>{{ departDate }}</b>
+        <br>Find flight near <b>{{ departDate }}</b>
       </h1>
       <h1 class="text-3xl font-semibold mb-6 mt-20 text-gray-800" v-else-if="returnDate && departDate">
-        <br>Find cheapest flight from <b>{{ departDate }}</b> to <b>{{ returnDate }}</b>
+        <br>Find flight from <b>{{ departDate }}</b> to <b>{{ returnDate }}</b>
       </h1>
       <h1 class="text-3xl font-semibold mb-4 mt-20 text-gray-700" v-else>
         <br>Millions of cheap flights. One simple search.
@@ -331,15 +331,15 @@ watch(statusMessage, (newValue, oldValue) => {
   
       <div v-if="error" class="text-red-500 mb-8">{{ error }}</div>
   
-      <div class="grid grid-cols-2 gap-4">
-        <div v-if="cheapestFlight !== null" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-8">
+      <div class="grid grid-cols-2 ">
+        <div v-if="cheapestFlight !== null" class="bg-white shadow-md  px-8 pt-6 pb-8 mb-8">
           <h2 class="text-2xl font-semibold mb-4">Cheapest flight to your destination:</h2>
           <p><b>Departure Date: </b>{{ formatReadableDate(cheapestFlight.departureDate) }}</p>
           <p><b>Arrival Date:</b> {{ formatReadableDate(cheapestFlight.arrivalDate) }}</p>
           <p><b>Price:</b> {{ cheapestFlight.price.value }} {{ cheapestFlight.price.currencySymbol }}</p>
         </div>
   
-        <div v-if="cheapestFlight !== null" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-8">
+        <div v-if="cheapestFlight !== null" class="bg-white shadow-md  px-8 pt-6 pb-8 mb-8">
           <div v-if="cheapestReturnFlight !== null">
             <h2 class="text-2xl font-semibold mb-4">Cheapest return flight:</h2>
             <p><b>Return Date: </b>{{ formatReadableDate(cheapestReturnFlight.departureDate) }}</p>
