@@ -56,18 +56,23 @@ const fetchFlightHistory = async () => {
     const response = await axios.get('/api/flight-history', config);
     flightHistory.value = await Promise.all(response.data.map(async (flight) => {
       let currentPrices = [];
+      let previousPrices = [];
       if (flight.api_url.length === 2) {
         const outboundPrice = await findCheapestFlight(flight.api_url[0], extractDetails(flight.api_url[0]).when);
         const returnPrice = await findCheapestFlight(flight.api_url[1], extractDetails(flight.api_url[1]).when);
         currentPrices.push(outboundPrice);
         currentPrices.push(returnPrice);
+        previousPrices.push(flight.amount[0]);
+        previousPrices.push(flight.amount[1]);
       } else {
         const singlePrice = await findCheapestFlight(flight.api_url[0], extractDetails(flight.api_url[0]).when);
         currentPrices.push(singlePrice);
+        previousPrices.push(flight.amount[0]);
       }
       return {
         ...flight,
         currentPrices,
+        previousPrices,
       };
     }));
     loading.value = false;
@@ -150,6 +155,14 @@ const isCurrentPriceHigherOrEqual = (flight) => {
   }
 };
 
+const calculatePercentageChange = (previousPrice, currentPrice) => {
+  if (previousPrice === null || currentPrice === null || previousPrice === 0) {
+    return '';
+  }
+  const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+  return change.toFixed(2);
+};
+
 onMounted(fetchFlightHistory);
 
 </script>
@@ -202,21 +215,22 @@ onMounted(fetchFlightHistory);
                   {{ price }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
                 </div>
               </td>
+
+              
               <td class="px-6 py-4 whitespace-nowrap">
-                <template v-if="flight.currentPrices.every(price => price === null || price === 0)">
-                  <div>No longer available :(</div>
-                </template>
-                <template v-else>
-                  <div v-for="(currentPrice, priceIndex) in flight.currentPrices" :key="priceIndex">
-                    <template v-if="currentPrice !== null && currentPrice !== 0">
-                      {{ currentPrice }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
-                    </template>
-                    <template v-else>
-                      No longer available :(
-                    </template>
-                  </div>
-                </template>
+                <div v-for="(currentPrice, priceIndex) in flight.currentPrices" :key="priceIndex">
+                  <template v-if="currentPrice !== null && currentPrice !== 0">
+                    {{ currentPrice }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
+                  </template>
+                  <template v-else>
+                    No longer available :(
+                  </template>
+                  <template v-if="flight.previousPrices[priceIndex] !== null && flight.previousPrices[priceIndex] !== 0">
+                    <span class="text-xs text-gray-500">{{ calculatePercentageChange(flight.previousPrices[priceIndex], currentPrice) }}</span>
+                  </template>
+                </div>
               </td>
+
               <td class="px-6 py-4 whitespace-nowrap">
               <button @click="deleteFlight(flight.id)" class="text-white bg-red-500 border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-600 hover:text-white">
                 Remove
