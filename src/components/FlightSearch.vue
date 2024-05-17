@@ -3,8 +3,9 @@ import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
-const authStore = useAuthStore();
+const currentDate = ref(new Date());
 const statusMessage = ref('')
+const authStore = useAuthStore();
 const origin = ref('');
 const destination = ref('');
 const departDate = ref('');
@@ -120,8 +121,6 @@ const handleSubmit = async () => {
     await getCheapestFlight();
     if (selectedOption.value == 'return') {
         await getCheapestReturn();
-    } else {
-        cheapestReturnFlight.value = null;
     }
 };
 
@@ -130,6 +129,7 @@ onMounted(fetchAirports);
 watch(origin, (newValue, oldValue) => {
     fetchAvalAirports();
 });
+
 
 watch(selectedOption, (newValue, oldValue) => {
     statusMessage.value = '';
@@ -157,6 +157,7 @@ watch(statusMessage, (newValue, oldValue) => {
     statusMessage.value = '';
   }, 5000);
 });
+// CONVERTING DATES 
 
 function formatReadableDate(isoDate) {
     const dateObject = new Date(isoDate);
@@ -242,15 +243,20 @@ const saveFlightDetails = () => {
     const response = await axios.post('/api/save-flight-history', dataToSend, config);
     
     console.log(response.data);
+    
+    statusMessage.value = 'Flight successfully added!';
+    document.getElementById('saveButton').disabled = true;
+
   } catch (error) {
     console.error(error);
+    statusMessage.value = 'Failed to add flight. Please try again.';
   }
 };
 
 </script>
 
 <template>
-  <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mb-8">
+  <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mb-20">
   
     <h1 class="text-3xl font-semibold mb-6 mt-20 text-gray-800" v-if="departDate && !returnDate"><br>Find one way cheapest flight near <b>{{ departDate }}</b></h1>
     <h1 class="text-3xl font-semibold mb-6 mt-20 text-gray-800" v-else-if="returnDate && departDate"><br>Find cheapest flight from <b>{{ departDate }}</b> to <b>{{returnDate}}</b></h1>
@@ -286,7 +292,7 @@ const saveFlightDetails = () => {
 
     <div class="mb-4">
       <label for="departDate" class="block text-base font-medium text-gray-700 mb-2">Departure Date</label>
-      <input type="date" id="departDate" v-model="departDate" class="form-input w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+      <input type="date" id="departDate" v-model="departDate" :min="currentDate.toISOString().split('T')[0]" class="form-input w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
     </div>
 
 
@@ -308,7 +314,7 @@ const saveFlightDetails = () => {
       <button 
           type="submit"
           :disabled="(!origin || !destination || !departDate || (!returnDate && selectedOption === 'return'))"
-          class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-sky-800 hover:bg-sky-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-900 disabled:opacity-90">Search</button>
+          class="w-full py-3 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-sky-800 hover:bg-sky-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-900 disabled:opacity-60">Search</button>
     </form>
   
     <div v-if="error" class="text-red-500 mb-8">{{ error }}</div>
@@ -339,7 +345,7 @@ const saveFlightDetails = () => {
           dark:hover:text-white dark:hover:bg-blue-800 md:border-0 md:p-0 md:hover:bg-sky-900 md:hover:text-white md:dark:hover:bg-sky-900 md:dark:hover:text-white">Login</router-link>
         </div> -->
   
-        <div v-if="cheapestFlight !== null && !authStore.user" class="bg-white shadow-md px-4 pt-6 pb-8 mb-8 text-center">
+        <div v-if="cheapestFlight !== null && authStore.user" class="bg-white shadow-md px-4 pt-6 pb-8 mb-8 text-center">
             <h2 class="text-lg font-semibold mb-4 pt-4">Do you like this option?</h2>
             <form @submit.prevent="saveHistory">
                 <button type="submit" v-if="cheapestFlight" @click="saveFlightDetails" 
@@ -349,10 +355,10 @@ const saveFlightDetails = () => {
                 Save {{ selectedOption === 'return' ? 'Return' : 'One-Way' }} Flight
                 </button>
             </form>
-          </div>
+        </div>
 
-          <div v-if="statusMessage" :class="[statusMessage === 'Flight successfully added!' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700', 'px-4 py-3 rounded relative mb-8']">
-        {{ statusMessage }}
+        <div v-if="statusMessage" :class="[statusMessage === 'Flight successfully added!' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700', 'px-4 py-3 rounded relative mb-8']">
+            {{ statusMessage }}
           <button @click="statusMessage = ''" class="absolute top-0 bottom-0 right-0 px-4 py-3">
           <svg class="h-6 w-6 text-black" role="button" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
