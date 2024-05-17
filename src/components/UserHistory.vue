@@ -130,7 +130,7 @@ const extractDetails = (url) => {
   };
 };
 
-const isCurrentPriceHigher = (flight) => {
+const isCurrentPriceHigherOrEqual = (flight) => {
   let totalPrice = 0;
   for (let i = 0; i < flight.amount.length; i++) {
     totalPrice += flight.amount[i];
@@ -139,78 +139,97 @@ const isCurrentPriceHigher = (flight) => {
   for (let i = 0; i < flight.currentPrices.length; i++) {
     currentPrice += flight.currentPrices[i];
   }
-  console.log(currentPrice, totalPrice)
-  return currentPrice > totalPrice;
+
+  if (currentPrice === null || currentPrice === 0) {
+    return 'bg-gray-100'; // Cena bieżąca jest równa null lub 0
+  } else if (currentPrice > totalPrice) {
+    return 'bg-red-100'; // Bieżąca cena jest większa
+  } else if (currentPrice < totalPrice) {
+    return 'bg-green-100'; // Bieżąca cena jest mniejsza
+  } else {
+    return 'bg-yellow-100'; // Ceny są równe
+  }
 };
 
 onMounted(fetchFlightHistory);
 </script>
 
 <template>
-  <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mt-20 mb-40 mx-10">
-    <h1 class="text-3xl font-semibold mb-6 mt-32 text-gray-800">Be up to date with your flights</h1>
+  <div class="flex justify-center">
+    <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mt-20 mb-40">
 
-    <div v-if="loading" class="text-gray-700">
-      Loading...
-    </div>
 
-    <div v-if="error" class="text-red-500">
-      {{ error }}
-    </div>
+      <div v-if="loading" class="text-gray-700">
+        Loading...
+      </div>
 
-    <div v-if="flightHistory.length && !loading" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mt-10 mb-8">
-      <table class="min-w-full divide-y divide-gray-200 mt-6">
-        <thead class="bg-gray-50">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trip</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Where</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(flight, index) in flightHistory" :key="index" :class="{'bg-red-100': isCurrentPriceHigher(flight), 'bg-green-100': !isCurrentPriceHigher(flight)}">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div v-if="flight.api_url.length === 2">Round-trip</div>
-              <div v-else>One-way</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div v-for="url in flight.api_url" :key="url">
-                {{ extractDetails(url).departure }}
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div v-for="url in flight.api_url" :key="url">
-                {{ extractDetails(url).destination }}
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div v-for="url in flight.api_url" :key="url">
-                {{ formatDate(extractDetails(url).when) }}
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div v-for="(price, priceIndex) in flight.amount" :key="priceIndex">
-                {{ price }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-  <div v-for="(currentPrice, priceIndex) in flight.currentPrices" :key="priceIndex">
-    {{ currentPrice }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
-  </div>
-</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <button @click="deleteFlight(flight.id)" class="text-red-500 bg-transparent border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-500 hover:text-white">
-                Remove
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-if="error" class="text-red-500">
+        {{ error }}
+      </div>
+
+      <div v-if="flightHistory.length && !loading" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mt-10 mb-8">
+        <table class="min-w-full divide-y divide-gray-200 mt-6">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trip</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Where</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="(flight, index) in flightHistory" :key="index" :class="isCurrentPriceHigherOrEqual(flight)">
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="flight.api_url.length === 2">Round-trip</div>
+                <div v-else>One-way</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-for="url in flight.api_url" :key="url">
+                  {{ extractDetails(url).departure }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-for="url in flight.api_url" :key="url">
+                  {{ extractDetails(url).destination }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-for="url in flight.api_url" :key="url">
+                  {{ formatDate(extractDetails(url).when) }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-for="(price, priceIndex) in flight.amount" :key="priceIndex">
+                  {{ price }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <template v-if="flight.currentPrices.every(price => price === null || price === 0)">
+                  <div>No longer available :(</div>
+                </template>
+                <template v-else>
+                  <div v-for="(currentPrice, priceIndex) in flight.currentPrices" :key="priceIndex">
+                    <template v-if="currentPrice !== null && currentPrice !== 0">
+                      {{ currentPrice }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
+                    </template>
+                  </div>
+                </template>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <button @click="deleteFlight(flight.id)" class="text-white bg-red-500 border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-600 hover:text-white">
+  Remove
+</button>
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
+
 
