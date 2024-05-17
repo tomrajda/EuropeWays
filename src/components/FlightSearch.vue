@@ -372,12 +372,12 @@ watch(statusMessage, (newValue, oldValue) => {
   
         <div v-if="cheapestFlight === null && !error && cheapestCallResponse !== null" class="text-gray-700 bg-white shadow-lg rounded-lg p-8 mb-8">
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-                <strong class="font-bold">No flights found!</strong>
+                <strong class="font-bold">No flights found for this date!</strong>
                 <span class="block sm:inline"> Try a different date.</span>
             </div>
         
 
-        <div v-if="minFareOneWay && minFareOneWay.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4">
+        <div v-if="minFareOneWay && minFareOneWay.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4 mb-4">
             <h2 class="text-2xl font-bold mb-4">Cheapest flights in this month! Check them out!</h2>
             <div v-for="(flight, index) in cheapestFlightsInMonth" :key="index">
                 <p class="mb-2">
@@ -409,7 +409,7 @@ watch(statusMessage, (newValue, oldValue) => {
             </div>
         
 
-        <div v-if="minFareReturn && minFareReturn.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4">
+        <div v-if="minFareReturn && minFareReturn.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4 mb-8">
             <h2 class="text-2xl font-bold mb-4">Cheapest return flights in this month! Check them out!</h2>
             <div v-for="(returnFlight, index) in cheapestReturnFlightsInMonth" :key="index">
                 <p class="mb-2">
