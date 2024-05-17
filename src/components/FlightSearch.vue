@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
 // Variables and refs
+const cheapestFlightsInMonth = ref([]);
+const cheapestReturnFlightsInMonth = ref([]);
 const currentDate = ref(new Date());
 const minFareOneWay = ref(null)
 const minFareReturn = ref(null)
@@ -46,12 +48,17 @@ const getCheapestFlight = async () => {
 
     const data = await response.json();
     cheapestFlight.value = data.outbound.fares.find(fare => fare.day == departDate.value);
-    minFareOneWay.value = data.outbound.minFare
+    minFareOneWay.value = data.outbound.minFare;
+    // Find three cheapest flights in the month
+    cheapestFlightsInMonth.value = data.outbound.fares.filter(fare => !fare.unavailable).sort((a, b) => a.price.value - b.price.value).slice(0, 3);
+    console.log('Cheapest flights in month:', cheapestFlightsInMonth);
+
 
     if (cheapestFlight.value && cheapestFlight.value.unavailable) {
-      throw new Error('Failed to find a flight')
+      throw new Error('Failed to find a flight');
     }
     error.value = null;
+
 
   } catch (error) {
     console.error('Error fetching cheapest flight:', error);
@@ -75,11 +82,18 @@ const getCheapestReturn = async () => {
 
     const data = await response.json();
     cheapestReturnFlight.value = data.outbound.fares.find(fare => fare.day == returnDate.value);
-    minFareReturn.value = data.outbound.minFare
+    minFareReturn.value = data.outbound.minFare;
+
+    // Find three cheapest return flights in the month
+    cheapestReturnFlightsInMonth.value = data.outbound.fares.filter(fare => !fare.unavailable).sort((a, b) => a.price.value - b.price.value).slice(0, 3);
+    console.log(cheapestReturnFlightsInMonth)
+    console.log('Cheapest return flights in month:', cheapestReturnFlightsInMonth);
     if (cheapestReturnFlight.value && cheapestReturnFlight.value.unavailable) {
-      throw new Error('Failed to find a flight')
+      throw new Error('Failed to find a flight');
     }
     error.value = null;
+
+
 
   } catch (error) {
     console.error('Error fetching cheapest flight:', error);
@@ -356,53 +370,68 @@ watch(statusMessage, (newValue, oldValue) => {
         </button>
       </div>
   
-        <div v-if="cheapestFlight == null && !error && cheapestCallResponse !== null" class="text-gray-700 bg-white shadow-lg rounded-lg p-8 mb-8">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-            <strong class="font-bold">No flights found!</strong>
-            <span class="block sm:inline"> Try a different date.</span>
-        </div>
+        <div v-if="cheapestFlight === null && !error && cheapestCallResponse !== null" class="text-gray-700 bg-white shadow-lg rounded-lg p-8 mb-8">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <strong class="font-bold">No flights found!</strong>
+                <span class="block sm:inline"> Try a different date.</span>
+            </div>
+        
+
         <div v-if="minFareOneWay && minFareOneWay.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4">
-            <h2 class="text-2xl font-bold mb-4">Cheapest flight in this month! Check it out!</h2>
-            <p class="mb-2">
-            <b>Departure Date: </b>{{ formatReadableDate(minFareOneWay.departureDate) }}
-            </p>
-            <p class="mb-2">
-            <b>Arrival Date:</b> {{ formatReadableDate(minFareOneWay.arrivalDate) }}
-            </p>
-            <p class="mb-2">
-            <b>Price:</b> {{ minFareOneWay.price.value }} {{ minFareOneWay.price.currencySymbol }}
-            </p>
+            <h2 class="text-2xl font-bold mb-4">Cheapest flights in this month! Check them out!</h2>
+            <div v-for="(flight, index) in cheapestFlightsInMonth" :key="index">
+                <p class="mb-2">
+                    <b>Departure Date: </b>{{ formatReadableDate(flight.departureDate) }}
+                </p>
+                <p class="mb-2">
+                    <b>Arrival Date:</b> {{ formatReadableDate(flight.arrivalDate) }}
+                </p>
+                <p class="mb-2">
+                    <b>Price:</b> {{ flight.price.value }} {{ flight.price.currencySymbol }}
+                </p>
+                <hr class="my-4">
+            </div>
         </div>
-        <div v-else class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mt-4" role="alert">
+        
+
+        <div v-else-if="minFareOneWay === null" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mt-4" role="alert">
             <strong class="font-bold">No flights available this month!</strong>
+            <span class="block sm:inline"> Please try another month.</span>
+        </div>
+        </div>
+
+
+        
+        <div v-if="cheapestReturnFlight === null && !error && cheapestReturnCallResponse !== null && selectedOption === 'return'" class="text-gray-700 bg-white shadow-md rounded-lg px-8 py-4 mb-8">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <strong class="font-bold">No return flights found!</strong>
+                <span class="block sm:inline"> Try a different date.</span>
+            </div>
+        
+
+        <div v-if="minFareReturn && minFareReturn.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4">
+            <h2 class="text-2xl font-bold mb-4">Cheapest return flights in this month! Check them out!</h2>
+            <div v-for="(returnFlight, index) in cheapestReturnFlightsInMonth" :key="index">
+                <p class="mb-2">
+                    <b>Departure Date: </b>{{ formatReadableDate(returnFlight.departureDate) }}
+                </p>
+                <p class="mb-2">
+                    <b>Arrival Date:</b> {{ formatReadableDate(returnFlight.arrivalDate) }}
+                </p>
+                <p class="mb-2">
+                    <b>Price:</b> {{ returnFlight.price.value }} {{ returnFlight.price.currencySymbol }}
+                </p>
+
+                <hr class="my-4">
+            </div>
+        </div>
+
+        <div v-else-if="minFareReturn === null" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mt-4" role="alert">
+            <strong class="font-bold">No return flights available this month!</strong>
             <span class="block sm:inline"> Please try another month.</span>
         </div>
         </div>
   
-
-
-      <div v-if="cheapestReturnFlight === null && !error && cheapestReturnCallResponse !== null && selectedOption === 'return'" class="text-gray-700 bg-white shadow-md rounded-lg px-8 py-4 mb-8">
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-            <strong class="font-bold">No flights found!</strong>
-            <span class="block sm:inline"> Try a different date.</span>
-        </div>
-        <div v-if="minFareReturn && minFareReturn.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4">
-            <h2 class="text-2xl font-bold mb-4">Cheapest flight in this month! Check it out!</h2>
-            <p class="mb-2">
-            <b>Departure Date: </b>{{ formatReadableDate(minFareReturn.departureDate) }}
-            </p>
-            <p class="mb-2">
-            <b>Arrival Date:</b> {{ formatReadableDate(minFareReturn.arrivalDate) }}
-            </p>
-            <p class="mb-2">
-            <b>Price:</b> {{ minFareReturn.price.value }} {{ minFareReturn.price.currencySymbol }}
-            </p>
-        </div>
-        <div v-else class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mt-4" role="alert">
-            <strong class="font-bold">No flights available this month!</strong>
-            <span class="block sm:inline"> Please try another month.</span>
-        </div>
-      </div>
   
     </div>
   </template>
