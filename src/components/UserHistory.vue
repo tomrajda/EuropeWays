@@ -1,14 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useAuthStore } from '../stores/auth';
 
-const authStore = useAuthStore();
 const flightHistory = ref([]);
 const loading = ref(true);
 const error = ref(null);
-const cheapestFlight = ref(null);
-const cheapestReturnFlight = ref(null);
 
 const getCookie = (cookieName) => {
   const name = cookieName + "=";
@@ -40,7 +36,7 @@ const findCheapestFlight = async (apiUrl, departDate) => {
     if (cheapestFare && cheapestFare.price && cheapestFare.price.value) {
       return cheapestFare.price.value;
     } else {
-      return null; // Zwraca null, gdy cena nie jest dostępna
+      return null;
     }
   } catch (error) {
     console.error('Error fetching cheapest flight:', error);
@@ -61,19 +57,19 @@ const fetchFlightHistory = async () => {
     };
     const response = await axios.get('/api/flight-history', config);
     flightHistory.value = await Promise.all(response.data.map(async (flight) => {
-      let currentPrices = []; // Tablica na ceny bieżące dla każdego segmentu lotu
+      let currentPrices = [];
       if (flight.api_url.length === 2) {
         const outboundPrice = await findCheapestFlight(flight.api_url[0], extractDetails(flight.api_url[0]).when);
         const returnPrice = await findCheapestFlight(flight.api_url[1], extractDetails(flight.api_url[1]).when);
-        currentPrices.push(outboundPrice); // Dodajemy cenę bieżącą dla pierwszego segmentu
-        currentPrices.push(returnPrice); // Dodajemy cenę bieżącą dla drugiego segmentu
+        currentPrices.push(outboundPrice);
+        currentPrices.push(returnPrice);
       } else {
         const singlePrice = await findCheapestFlight(flight.api_url[0], extractDetails(flight.api_url[0]).when);
-        currentPrices.push(singlePrice); // Dodajemy cenę bieżącą dla pojedynczego segmentu
+        currentPrices.push(singlePrice);
       }
       return {
         ...flight,
-        currentPrices, // Zapisujemy tablicę cen bieżących
+        currentPrices,
       };
     }));
     loading.value = false;
@@ -133,21 +129,29 @@ const extractDetails = (url) => {
 const isCurrentPriceHigherOrEqual = (flight) => {
   let totalPrice = 0;
   for (let i = 0; i < flight.amount.length; i++) {
+    if (flight.amount[i] === 0 || flight.amount[i] === null ) {
+      totalPrice = 0;
+      break;
+    }
     totalPrice += flight.amount[i];
   }
   let currentPrice = 0;
   for (let i = 0; i < flight.currentPrices.length; i++) {
+    if (flight.currentPrices[i] === 0 || flight.currentPrices[i] === null) {
+      currentPrice = 0;
+      break;
+    }
     currentPrice += flight.currentPrices[i];
   }
 
-  if (currentPrice === null || currentPrice === 0) {
-    return 'bg-gray-100'; // Cena bieżąca jest równa null lub 0
+  if (currentPrice === null || currentPrice === 0 || totalPrice === 0) {
+    return 'bg-gray-100';
   } else if (currentPrice > totalPrice) {
-    return 'bg-red-100'; // Bieżąca cena jest większa
+    return 'bg-red-100';
   } else if (currentPrice < totalPrice) {
-    return 'bg-green-100'; // Bieżąca cena jest mniejsza
+    return 'bg-green-100';
   } else {
-    return 'bg-yellow-100'; // Ceny są równe
+    return 'bg-yellow-100';
   }
 };
 
@@ -159,9 +163,11 @@ onMounted(fetchFlightHistory);
     <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mt-20 mb-40">
 
 
-      <div v-if="loading" class="text-gray-700">
-        Loading...
-      </div>
+
+        <div v-if="loading" class="text-gray-700 text-center flex justify-center items-center h-screen">
+          Loading...
+        </div>
+
 
       <div v-if="error" class="text-red-500">
         {{ error }}
@@ -177,6 +183,7 @@ onMounted(fetchFlightHistory);
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -214,6 +221,9 @@ onMounted(fetchFlightHistory);
                   <div v-for="(currentPrice, priceIndex) in flight.currentPrices" :key="priceIndex">
                     <template v-if="currentPrice !== null && currentPrice !== 0">
                       {{ currentPrice }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
+                    </template>
+                    <template v-else>
+                      No longer available :(
                     </template>
                   </div>
                 </template>
