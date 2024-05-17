@@ -44,8 +44,6 @@ const findCheapestFlight = async (apiUrl, departDate) => {
   }
 };
 
-
-
 const fetchFlightHistory = async () => {
   try {
     await axios.get('/sanctum/csrf-cookie');
@@ -79,9 +77,6 @@ const fetchFlightHistory = async () => {
     loading.value = false;
   }
 };
-
-
-
 
 const deleteFlight = async (flightId) => {
   try {
@@ -156,23 +151,18 @@ const isCurrentPriceHigherOrEqual = (flight) => {
 };
 
 onMounted(fetchFlightHistory);
+
 </script>
 
 <template>
   <div class="flex justify-center">
     <div class="container max-w-5xl mx-auto bg-zinc-200 bg-opacity-60 shadow-md rounded-lg px-10 pt-0 pb-12 mt-20 mb-40">
-
-
-
         <div v-if="loading" class="text-gray-700 text-center flex justify-center items-center h-screen">
           Loading...
         </div>
-
-
       <div v-if="error" class="text-red-500">
         {{ error }}
       </div>
-
       <div v-if="flightHistory.length && !loading" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mt-10 mb-8">
         <table class="min-w-full divide-y divide-gray-200 mt-6">
           <thead class="bg-gray-50">
@@ -188,7 +178,6 @@ onMounted(fetchFlightHistory);
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="(flight, index) in flightHistory" :key="index" :class="isCurrentPriceHigherOrEqual(flight)">
-
               <td class="px-6 py-4 whitespace-nowrap">
                 <div v-if="flight.api_url.length === 2">Round-trip</div>
                 <div v-else>One-way</div>
@@ -229,10 +218,9 @@ onMounted(fetchFlightHistory);
                 </template>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <button @click="deleteFlight(flight.id)" class="text-white bg-red-500 border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-600 hover:text-white">
-  Remove
-</button>
-
+              <button @click="deleteFlight(flight.id)" class="text-white bg-red-500 border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-600 hover:text-white">
+                Remove
+              </button>
               </td>
             </tr>
           </tbody>
