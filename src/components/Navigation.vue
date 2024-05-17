@@ -1,3 +1,11 @@
+<style>
+  .router-link-active {
+    color: white;
+    border-radius: 5px;
+    font-weight: semibold;
+  }
+</style>
+
 <script setup>
 
     import { useAuthStore } from '../stores/auth';
