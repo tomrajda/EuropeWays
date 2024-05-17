@@ -157,7 +157,7 @@ const isCurrentPriceHigherOrEqual = (flight) => {
 
 const calculatePercentageChange = (previousPrice, currentPrice) => {
   if (previousPrice === null || currentPrice === null || previousPrice === 0) {
-    return '';
+    return 'N/A';
   }
   const change = ((currentPrice - previousPrice) / previousPrice) * 100;
   return change.toFixed(2);
@@ -184,7 +184,7 @@ onMounted(fetchFlightHistory);
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">From</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Where</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">When</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Price</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -225,9 +225,9 @@ onMounted(fetchFlightHistory);
                   <template v-else>
                     No longer available :(
                   </template>
-                  <template v-if="flight.previousPrices[priceIndex] !== null && flight.previousPrices[priceIndex] !== 0">
-                    <span class="text-xs text-gray-500">{{ calculatePercentageChange(flight.previousPrices[priceIndex], currentPrice) }}</span>
-                  </template>
+                  <template v-if="calculatePercentageChange(flight.previousPrices[priceIndex], currentPrice) !== 'N/A'">
+  <span class="text-xs text-gray-500"> ({{ calculatePercentageChange(flight.previousPrices[priceIndex], currentPrice) + '%' }})</span>
+</template>
                 </div>
               </td>
 
@@ -243,5 +243,6 @@ onMounted(fetchFlightHistory);
     </div>
   </div>
 </template>
+
 
 
