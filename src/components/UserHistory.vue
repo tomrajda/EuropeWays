@@ -24,37 +24,30 @@ const getCookie = (cookieName) => {
   return "";
 };
 
-const getCheapestFlight = async (apiUrl) => {
+const findCheapestFlight = async (apiUrl, departDate) => {
   try {
     const response = await fetch(apiUrl);
-    console.log('Cheapest flight response:', response);
+
     if (!response.ok) {
       throw new Error('Failed to fetch data');
     }
+
     const data = await response.json();
-    console.log('Cheapest flight data:', data);
-    return data.outbound.fares[0].price.value;
+    const cheapestFare = data.outbound.fares.find(fare => fare.day === departDate);
+
+    console.log(cheapestFare.price)
+
+    if (cheapestFare && cheapestFare.price && cheapestFare.price.value) {
+      return cheapestFare.price.value;
+    } else {
+      return null; // Zwraca null, gdy cena nie jest dostępna
+    }
   } catch (error) {
     console.error('Error fetching cheapest flight:', error);
     return null;
   }
 };
 
-const getCheapestReturn = async (apiUrl) => {
-  try {
-    const response = await fetch(apiUrl);
-    console.log('Cheapest return flight response:', response);
-    if (!response.ok) {
-      throw new Error('Failed to fetch data');
-    }
-    const data = await response.json();
-    console.log('Cheapest return flight data:', data);
-    return data.outbound.fares[0].price.value;
-  } catch (error) {
-    console.error('Error fetching cheapest return flight:', error);
-    return null;
-  }
-};
 
 
 const fetchFlightHistory = async () => {
@@ -68,19 +61,19 @@ const fetchFlightHistory = async () => {
     };
     const response = await axios.get('/api/flight-history', config);
     flightHistory.value = await Promise.all(response.data.map(async (flight) => {
-      let currentPrice;
-      let currency = extractDetails(flight.api_url[0]).currency;
+      let currentPrices = []; // Tablica na ceny bieżące dla każdego segmentu lotu
       if (flight.api_url.length === 2) {
-        const outboundPrice = await getCheapestFlight(flight.api_url[0]);
-        const returnPrice = await getCheapestReturn(flight.api_url[1]);
-        currentPrice = outboundPrice + returnPrice;
+        const outboundPrice = await findCheapestFlight(flight.api_url[0], extractDetails(flight.api_url[0]).when);
+        const returnPrice = await findCheapestFlight(flight.api_url[1], extractDetails(flight.api_url[1]).when);
+        currentPrices.push(outboundPrice); // Dodajemy cenę bieżącą dla pierwszego segmentu
+        currentPrices.push(returnPrice); // Dodajemy cenę bieżącą dla drugiego segmentu
       } else {
-        currentPrice = await getCheapestFlight(flight.api_url[0]);
+        const singlePrice = await findCheapestFlight(flight.api_url[0], extractDetails(flight.api_url[0]).when);
+        currentPrices.push(singlePrice); // Dodajemy cenę bieżącą dla pojedynczego segmentu
       }
       return {
         ...flight,
-        currentPrice,
-        currency
+        currentPrices, // Zapisujemy tablicę cen bieżących
       };
     }));
     loading.value = false;
@@ -90,6 +83,9 @@ const fetchFlightHistory = async () => {
     loading.value = false;
   }
 };
+
+
+
 
 const deleteFlight = async (flightId) => {
   try {
@@ -122,7 +118,7 @@ const extractDetails = (url) => {
     return {
       departure: match[1],
       destination: match[2],
-      when: formatDate(match[3]),
+      when: match[3],
       currency: currencyMatch ? currencyMatch[1] : ''
     };
   }
@@ -132,6 +128,19 @@ const extractDetails = (url) => {
     when: '',
     currency: ''
   };
+};
+
+const isCurrentPriceHigher = (flight) => {
+  let totalPrice = 0;
+  for (let i = 0; i < flight.amount.length; i++) {
+    totalPrice += flight.amount[i];
+  }
+  let currentPrice = 0;
+  for (let i = 0; i < flight.currentPrices.length; i++) {
+    currentPrice += flight.currentPrices[i];
+  }
+  console.log(currentPrice, totalPrice)
+  return currentPrice > totalPrice;
 };
 
 onMounted(fetchFlightHistory);
@@ -163,7 +172,7 @@ onMounted(fetchFlightHistory);
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(flight, index) in flightHistory" :key="index">
+          <tr v-for="(flight, index) in flightHistory" :key="index" :class="{'bg-red-100': isCurrentPriceHigher(flight), 'bg-green-100': !isCurrentPriceHigher(flight)}">
             <td class="px-6 py-4 whitespace-nowrap">
               <div v-if="flight.api_url.length === 2">Round-trip</div>
               <div v-else>One-way</div>
@@ -180,7 +189,7 @@ onMounted(fetchFlightHistory);
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div v-for="url in flight.api_url" :key="url">
-                {{ extractDetails(url).when }}
+                {{ formatDate(extractDetails(url).when) }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -189,8 +198,10 @@ onMounted(fetchFlightHistory);
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              {{ flight.currentPrice }} {{ flight.currency }}
-            </td>
+  <div v-for="(currentPrice, priceIndex) in flight.currentPrices" :key="priceIndex">
+    {{ currentPrice }} {{ extractDetails(flight.api_url[priceIndex]).currency }}
+  </div>
+</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <button @click="deleteFlight(flight.id)" class="text-red-500 bg-transparent border border-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-red-500 hover:text-white">
                 Remove
@@ -202,3 +213,4 @@ onMounted(fetchFlightHistory);
     </div>
   </div>
 </template>
+
