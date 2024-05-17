@@ -356,7 +356,7 @@ watch(statusMessage, (newValue, oldValue) => {
                   class="block mx-auto w-full rounded py-2 text-white bg-indigo-700 hover:bg-sky-900 focus:outline-none"
                   :class="{'bg-gray-400 cursor-not-allowed': cheapestReturnFlight === null && selectedOption === 'return'}"
                   :disabled="cheapestReturnFlight === null && selectedOption === 'return'" id="saveButton">
-            Track this {{ selectedOption === 'return' ? 'Return' : 'One-Way' }} Flight
+            Track this Flight
           </button>
         </form>
       </div>

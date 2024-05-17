@@ -84,26 +84,26 @@ onMounted(async () => {
     <div class="grid grid-cols-3 gap-6">
         <!-- Paris -->
         <div class="bg-white bg-opacity-80 text-center p-4 rounded-lg">
-            <img src="\public\paris.jpg" alt="Zdjęcie 1" class="mx-auto h-70 w-60 rounded-md mb-4">
+            <img src="\public\paris.jpg"  class="mx-auto h-70 w-60 rounded-md mb-4">
             <p class="text-gray-800 text-3xl font-semibold">Paris</p>
             <br>
-            <p class="text-gray-800 text-xl font-semibold">{{ flightInfo.BVA }}</p>
+            <p class="text-gray-800 text-2xl font-semibold">{{ flightInfo.BVA }} €</p>
         </div>
 
         <!-- Rome -->
         <div class="bg-white bg-opacity-80 text-center p-4 rounded-lg">
-            <img src="\public\rome.jpg" alt="Zdjęcie 2" class="mx-auto h-70 w-60 rounded-md mb-4">
+            <img src="\public\rome.jpg"  class="mx-auto h-70 w-60 rounded-md mb-4">
             <p class="text-gray-800 text-3xl font-semibold">Rome</p>
             <br>
-            <p class="text-gray-800 text-xl font-semibold">{{ flightInfo.CIA }}</p>
+            <p class="text-gray-800 text-2xl font-semibold">{{ flightInfo.CIA }} € </p>
         </div>
 
         <!-- Barcelona -->
         <div class="bg-white bg-opacity-80 text-center p-4 rounded-lg">
-            <img src="\public\barcelona.jpg" alt="Zdjęcie 3" class="mx-auto h-70 w-60 rounded-md mb-4">
+            <img src="\public\barcelona.jpg" class="mx-auto h-70 w-60 rounded-md mb-4">
             <p class="text-gray-800 text-3xl font-semibold">Barcelona</p>
             <br>
-            <p class="text-gray-800 text-xl font-semibold">{{ flightInfo.BCN }}</p>
+            <p class="text-gray-800 text-2xl font-semibold">{{ flightInfo.BCN }} €</p>
         </div>
     </div>
 </div>
