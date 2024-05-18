@@ -270,7 +270,7 @@ watch(statusMessage, (newValue, oldValue) => {
         <br>Find flight from <b>{{ departDate }}</b> to <b>{{ returnDate }}</b>
       </h1>
       <h1 class="text-3xl font-semibold mb-4 mt-20 text-gray-700" v-else>
-        <br>Millions of cheap flights. One simple search.
+        <br>Find a flight
       </h1>
   
       <div>
@@ -356,7 +356,7 @@ watch(statusMessage, (newValue, oldValue) => {
                   class="block mx-auto w-full rounded py-2 text-white bg-indigo-700 hover:bg-sky-900 focus:outline-none"
                   :class="{'bg-gray-400 cursor-not-allowed': cheapestReturnFlight === null && selectedOption === 'return'}"
                   :disabled="cheapestReturnFlight === null && selectedOption === 'return'" id="saveButton">
-            Track this Flight
+            Track
           </button>
         </form>
       </div>
