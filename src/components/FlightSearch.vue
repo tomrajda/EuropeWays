@@ -378,7 +378,7 @@ watch(statusMessage, (newValue, oldValue) => {
         
 
         <div v-if="minFareOneWay && minFareOneWay.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4 mb-4">
-            <h2 class="text-2xl font-bold mb-4">Cheapest flights in this month! Check them out!</h2>
+            <h2 class="text-2xl font-bold mb-4">Check out other options below!</h2>
             <div v-for="(flight, index) in cheapestFlightsInMonth" :key="index">
                 <p class="mb-2">
                     <b>Departure Date: </b>{{ formatReadableDate(flight.departureDate) }}
@@ -410,7 +410,7 @@ watch(statusMessage, (newValue, oldValue) => {
         
 
         <div v-if="minFareReturn && minFareReturn.unavailable === false" class="bg-gray-50 shadow-md rounded-lg p-8 mt-4 mb-8">
-            <h2 class="text-2xl font-bold mb-4">Cheapest return flights in this month! Check them out!</h2>
+            <h2 class="text-2xl font-bold mb-4">Check out other options below!</h2>
             <div v-for="(returnFlight, index) in cheapestReturnFlightsInMonth" :key="index">
                 <p class="mb-2">
                     <b>Departure Date: </b>{{ formatReadableDate(returnFlight.departureDate) }}

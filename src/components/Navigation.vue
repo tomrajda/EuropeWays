@@ -69,7 +69,7 @@
                     inline-flex 
                     items-center 
                     rounded-lg 
-                    p-2 
+                    p-10
                     text-sm text-gray-500 
                     hover:bg-gray-100  
                     focus:outline-none focus:ring-2 focus:ring-gray-200 
@@ -101,6 +101,7 @@
             >
                 <ul 
                     class="
+                        text-xl
                         mt-0
                         mb-0
                         flex flex-col
@@ -122,6 +123,7 @@
                     <li>
                             <router-link :to="{name: 'FlightSearch'}"
                             class="
+                            text-xl
                                 block
                                     rounded
                                     py-2
@@ -143,6 +145,7 @@
                         <li>
                             <router-link :to="{name: 'Login'}"
                                 class="
+                                text-xl
                                     block
                                     rounded
                                     py-2
@@ -164,6 +167,7 @@
                         <li>
                             <router-link :to="{name: 'Signup'}"
                                 class="
+                                text-xl
                                     block
                                     rounded
                                     py-2
@@ -187,6 +191,7 @@
                         <li>
                             <router-link :to="{name: 'UserHistory'}"
                                 class="
+                                text-xl
                                     block
                                     rounded
                                     py-2
@@ -209,6 +214,7 @@
                         <button  
                             @click="handleLogout"
                             class="
+                            text-xl
                                 block
                                 rounded
                                 py-2
