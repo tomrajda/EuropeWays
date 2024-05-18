@@ -176,7 +176,7 @@ onMounted(fetchFlightHistory);
       <div v-if="error" class="text-red-500">
         {{ error }}
       </div>
-      <div v-if="flightHistory.length && !loading" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mt-10 mb-8">
+      <div v-if="flightHistory.length && !loading" class="bg-white shadow-md rounded px-4 pt-6 pb-8 mt-10 mb-8">
         <table class="min-w-full divide-y divide-gray-200 mt-6">
           <thead class="bg-gray-50">
             <tr>
